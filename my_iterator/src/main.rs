@@ -44,4 +44,15 @@ mod test{
         assert_eq!(None, itr.next());
     }
 
+    #[test]
+    fn filter_should_filter_odd_number() {
+        let mut itr = Rangei32 {start: 0, end: 5}
+                                .filter(|v| *v % 2 == 0);
+
+        assert_eq!(0, itr.next().unwrap());
+        assert_eq!(2, itr.next().unwrap());
+        assert_eq!(4, itr.next().unwrap());
+        assert_eq!(None, itr.next());
+    }
+
 }

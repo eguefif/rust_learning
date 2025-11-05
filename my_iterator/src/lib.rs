@@ -1,4 +1,5 @@
 use crate::adaptors::map::Map;
+use crate::adaptors::filter::Filter;
 
 pub mod adaptors;
 
@@ -13,5 +14,13 @@ pub trait MyIterator {
         F: FnMut(Self::Item) -> B
     {
         Map::new(self, f)
+    }
+
+    fn filter<F>(self, f: F) -> Filter::<Self, F>
+    where
+        Self: Sized,
+        F: Fn(&Self::Item) -> bool
+    {
+        Filter::new(self, f)
     }
 }
