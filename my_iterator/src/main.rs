@@ -20,8 +20,7 @@ impl MyIterator for Rangei32 {
 }
 
 fn main() {
-    let mut itr = Rangei32 {start:0, end: 10}
-                            .map(|v| v + 1);
+    let mut itr = Rangei32 {start:0, end: 10}.map(|v| v + 1);
     while let Some(v) = itr.next() {
         println!("{}", v);
     }
