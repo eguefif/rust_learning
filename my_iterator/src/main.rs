@@ -32,6 +32,15 @@ mod test{
     use super::*;
 
     #[test]
+    fn it_turn_vec_into_my_iter() {
+        let v = vec![1, 2];
+        let mut itr = v.my_iter();
+        assert_eq!(&1, itr.next().unwrap());
+        assert_eq!(&2, itr.next().unwrap());
+        assert_eq!(None, itr.next());
+    }
+
+    #[test]
     fn map_should_add_1() {
         let mut itr = Rangei32 {start: 0, end: 5}
                                 .map(|v| v + 1);
