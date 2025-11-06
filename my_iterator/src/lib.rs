@@ -3,6 +3,7 @@ use crate::adaptors::filter::Filter;
 use crate::adaptors::take::Take;
 use crate::adaptors::skip::Skip;
 use crate::adaptors::chain::Chain;
+use crate::adaptors::zip::Zip;
 
 pub mod adaptors;
 pub mod my_iter;
@@ -59,5 +60,12 @@ pub trait MyIterator {
         Self: Sized,
     {
         Chain::new(self, iter)
+    }
+
+    fn zip(self, iter: Self) -> Zip::<Self> 
+    where
+        Self: Sized,
+    {
+        Zip::new(self, iter)
     }
 }
