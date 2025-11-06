@@ -76,4 +76,15 @@ mod test{
         assert_eq!(None, itr.next());
     }
 
+    #[test]
+    fn skip_should_skip_n_values() {
+        let v = vec![0, 1, 2, 3, 4];
+        let mut itr = v.my_iter().skip(2);
+
+        assert_eq!(Some(&2), itr.next());
+        assert_eq!(Some(&3), itr.next());
+        assert_eq!(Some(&4), itr.next());
+        assert_eq!(None, itr.next());
+    }
+
 }
