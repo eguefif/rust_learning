@@ -79,7 +79,7 @@ As a do the project one by one, I review the the content. My progress are marked
 
 **What Success Looks Like**:
 ```rust
-let result: Vec<_> = (0..10)
+let result: Vec<_> = vec![0..10]
     .my_iter()
     .filter(|x| x % 2 == 0)
     .map(|x| x * x)

@@ -1,26 +1,10 @@
 use my_iterator::MyIterator;
-
-struct Rangei32{
-    start: i32,
-    end: i32,
-}
-
-impl MyIterator for Rangei32 {
-    type Item = i32;
-
-    fn next(&mut self) -> Option<i32> {
-        if self.start == self.end {
-            return None;
-        }
-        let retval = self.start;
-
-        self.start += 1;
-        Some(retval)
-    }
-}
+use my_iterator::iter::ToMyIterator;
 
 fn main() {
-    let mut itr = Rangei32 {start:0, end: 10}.map(|v| v + 1);
+    println!("\nNew example with my_iter");
+    let v = vec![1, 2, 3, 4, 5];
+    let mut itr = v.my_iter();
     while let Some(v) = itr.next() {
         println!("{}", v);
     }
@@ -41,25 +25,36 @@ mod test{
 
     #[test]
     fn map_should_add_1() {
-        let mut itr = Rangei32 {start: 0, end: 5}
-                                .map(|v| v + 1);
+        let v = vec![0, 1, 2, 3, 4, 5];
+        let mut itr = v.my_iter().map(|v| v + 1);
 
-        assert_eq!(1, itr.next().unwrap());
-        assert_eq!(2, itr.next().unwrap());
-        assert_eq!(3, itr.next().unwrap());
-        assert_eq!(4, itr.next().unwrap());
-        assert_eq!(5, itr.next().unwrap());
+        assert_eq!(Some(1), itr.next());
+        assert_eq!(Some(2), itr.next());
+        assert_eq!(Some(3), itr.next());
+        assert_eq!(Some(4), itr.next());
+        assert_eq!(Some(5), itr.next());
+        assert_eq!(Some(6), itr.next());
+        assert_eq!(None, itr.next());
+    }
+
+    #[test]
+    fn map_should_return_lengnths() {
+        let v = vec!["hello".to_string(), "world".to_string()];
+        let mut itr = v.my_iter().map(|v| v.len());
+
+        assert_eq!(Some(5), itr.next());
+        assert_eq!(Some(5), itr.next());
         assert_eq!(None, itr.next());
     }
 
     #[test]
     fn filter_should_filter_odd_number() {
-        let mut itr = Rangei32 {start: 0, end: 5}
-                                .filter(|v| *v % 2 == 0);
+        let v= vec![0, 1, 2, 3, 4, 5];
+        let mut itr = v.my_iter().filter(|x| *x % 2 == 0);
 
-        assert_eq!(0, itr.next().unwrap());
-        assert_eq!(2, itr.next().unwrap());
-        assert_eq!(4, itr.next().unwrap());
+        assert_eq!(Some(&0), itr.next());
+        assert_eq!(Some(&2), itr.next());
+        assert_eq!(Some(&4), itr.next());
         assert_eq!(None, itr.next());
     }
 
