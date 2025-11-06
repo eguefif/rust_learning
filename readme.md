@@ -65,9 +65,9 @@ As a do the project one by one, I review the the content. My progress are marked
 ### Project 1: Iterator Library (1 week)
 
 **What to Build**:
-- Core `MyIterator` trait with `next()` method
-- Combinators: `map`, `filter`, `fold`, `take`, `skip`
-- Adaptors: `chain`, `zip`, `enumerate`
+- Core `MyIterator` trait with `next()` method and a `my_iter()` for Vec
+- Adaptors: `map`, `filter`, `chain`, `zip`, `enumerate`, `take`, `skip`
+- Consumers: `fold`, `any`, `position`
 - Collectors: `collect()` into `Vec` and custom containers
 
 **Key Learning Outcomes**:
