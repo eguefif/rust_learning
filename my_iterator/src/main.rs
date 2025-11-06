@@ -87,4 +87,16 @@ mod test{
         assert_eq!(None, itr.next());
     }
 
+    #[test]
+    fn chain_chains_two_iterators() {
+        let v1 = vec![0, 1,];
+        let v2 = vec![2, 3];
+        let mut itr = v1.my_iter().chain(v2.my_iter());
+
+        assert_eq!(Some(&0), itr.next());
+        assert_eq!(Some(&1), itr.next());
+        assert_eq!(Some(&2), itr.next());
+        assert_eq!(Some(&3), itr.next());
+        assert_eq!(None, itr.next());
+    }
 }
