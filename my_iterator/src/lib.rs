@@ -1,5 +1,6 @@
 use crate::adaptors::map::Map;
 use crate::adaptors::filter::Filter;
+use crate::adaptors::take::Take;
 
 pub mod adaptors;
 pub mod my_iter;
@@ -35,5 +36,12 @@ pub trait MyIterator {
             accum = f(accum, value);
         }
         accum
+    }
+
+    fn take(self, n: usize) -> Take::<Self> 
+    where
+        Self: Sized,
+    {
+        Take::new(self, n)
     }
 }

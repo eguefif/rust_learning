@@ -66,4 +66,14 @@ mod test{
         assert_eq!(3, result);
     }
 
+    #[test]
+    fn take_should_stop_iterator() {
+        let v = vec![0, 1, 2, 3, 4];
+        let mut itr = v.my_iter().take(2);
+
+        assert_eq!(Some(&0), itr.next());
+        assert_eq!(Some(&1), itr.next());
+        assert_eq!(None, itr.next());
+    }
+
 }
