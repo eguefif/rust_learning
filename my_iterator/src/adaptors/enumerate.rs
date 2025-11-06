@@ -24,4 +24,8 @@ impl<I: MyIterator> MyIterator for Enumerate<I> {
         }
         None
     }
+
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        (0, None)
+    }
 }

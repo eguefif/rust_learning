@@ -23,4 +23,8 @@ impl<I: MyIterator> MyIterator for Skip<I> {
     fn next(&mut self) -> Option::<Self::Item> {
         self.iter.next()
     }
+
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        (0, None)
+    }
 }

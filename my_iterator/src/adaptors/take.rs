@@ -26,4 +26,8 @@ impl<I: MyIterator> MyIterator for Take<I> {
         self.counter += 1;
         return self.iter.next();
     }
+
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        (0, None)
+    }
 }

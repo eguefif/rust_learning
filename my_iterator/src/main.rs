@@ -2,10 +2,15 @@ use my_iterator::MyIterator;
 use my_iterator::my_iter::ToMyIterator;
 
 fn main() {
-    println!("\nNew example with my_iter");
     let v = vec![1, 2, 3, 4, 5];
-    let mut itr = v.my_iter();
-    while let Some(v) = itr.next() {
+    let result: Vec<i32> = v
+            .my_iter()
+            .filter(|x| *x % 2 == 0)
+            .map(|x| x * x)
+            .take(4)
+            .skip(1)
+            .collect();
+    for v in result.iter() {
         println!("{}", v);
     }
 }
@@ -152,5 +157,15 @@ mod test{
         let result = v1.my_iter().all(|x| *x == 2);
 
         assert_eq!(result, false);
+    }
+
+    #[test]
+    fn collect_into_vec() {
+        let v1 = vec![0, 1, 2];
+        let vec: Vec<i32> = v1.my_iter().map(|x| x + 1).collect();
+
+        assert_eq!(v1[0] + 1, vec[0]);
+        assert_eq!(v1[1] + 1, vec[1]);
+        assert_eq!(v1[2] + 1, vec[2]);
     }
 }

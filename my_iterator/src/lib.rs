@@ -9,11 +9,14 @@ use crate::adaptors::enumerate::Enumerate;
 pub mod adaptors;
 pub mod my_iter;
 
+use crate::my_iter::FromMyIterator;
+
 /// Adaptors definition
 pub trait MyIterator {
     type Item;
 
     fn next(&mut self) -> Option<Self::Item>;
+    fn size_hint(&self) -> (usize, Option<usize>);
 
     fn map<F, B>(self, f: F) -> Map::<Self, F> 
     where
@@ -105,4 +108,10 @@ pub trait MyIterator {
         true
     }
 
+    fn collect<T: FromMyIterator<Self::Item>>(self) -> T 
+    where
+        Self: Sized
+    {
+        T::from_iter(self)
+    }
 }

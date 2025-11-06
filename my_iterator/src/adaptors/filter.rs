@@ -30,4 +30,8 @@ impl<I, F> MyIterator for Filter<I, F>
         }
         None
     }
+
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        (0, None)
+    }
 }

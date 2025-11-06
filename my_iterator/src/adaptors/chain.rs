@@ -25,4 +25,8 @@ impl<I: MyIterator> MyIterator for Chain<I> {
         }
         None
     }
+
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        (0, None)
+    }
 }

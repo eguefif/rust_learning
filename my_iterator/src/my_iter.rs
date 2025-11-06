@@ -33,6 +33,10 @@ impl<'a, T> MyIterator for MyIter<'a, T> {
         self.current += 1;
         value
     }
+
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        (0, Some(self.size))
+    }
 }
 
 /// This trait is impl for Vec to return a type that impl
@@ -55,5 +59,32 @@ impl<T> ToMyIterator for Vec<T> {
 
     fn my_iter(&self) -> MyIter<'_, Self::Item> {
         MyIter::new(self.len(), self.as_slice())
+    }
+}
+
+/// FromMyIterator adds a from_iter that will
+/// build a vec for the collect function
+/// In The following here what represent the generic types
+/// T => The type of the vec object values
+/// I => an iterator that impl MyIterator, this iterator should have Item of type T
+pub trait FromMyIterator<T>: Sized {
+    fn from_iter<I: MyIterator<Item=T>>(iter: I) -> Self;
+}
+
+/// In the following, FromMyIterator needs a <T> because we need to know this
+/// type in the trait definition. See the above definition.
+impl<T> FromMyIterator<T> for Vec<T> {
+    fn from_iter<I: MyIterator<Item=T>>(mut iter: I) -> Self {
+        let (_start, end) = iter.size_hint();
+        let mut vec;
+        if let Some(len) = end {
+            vec = Vec::with_capacity(len);
+        } else {
+            vec = Vec::new();
+        }
+        while let Some(value) = iter.next() {
+            vec.push(value);
+        }
+        vec
     }
 }

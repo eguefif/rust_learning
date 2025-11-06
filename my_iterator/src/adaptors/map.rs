@@ -25,4 +25,8 @@ impl<A, I: MyIterator, F> MyIterator for Map<I, F>
 
         Some((self.f)(value))
     }
+
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        (0, None)
+    }
 }
