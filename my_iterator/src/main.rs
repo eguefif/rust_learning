@@ -1,5 +1,5 @@
 use my_iterator::MyIterator;
-use my_iterator::iter::ToMyIterator;
+use my_iterator::my_iter::ToMyIterator;
 
 fn main() {
     println!("\nNew example with my_iter");
@@ -56,6 +56,14 @@ mod test{
         assert_eq!(Some(&2), itr.next());
         assert_eq!(Some(&4), itr.next());
         assert_eq!(None, itr.next());
+    }
+
+    #[test]
+    fn fold_should_accumulate() {
+        let v = vec![0, 1, 2];
+        let result = v.my_iter().fold(0, |acc, v| acc + v);
+
+        assert_eq!(3, result);
     }
 
 }

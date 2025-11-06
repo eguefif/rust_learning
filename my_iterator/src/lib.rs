@@ -2,7 +2,7 @@ use crate::adaptors::map::Map;
 use crate::adaptors::filter::Filter;
 
 pub mod adaptors;
-pub mod iter;
+pub mod my_iter;
 
 pub trait MyIterator {
     type Item;
@@ -23,5 +23,17 @@ pub trait MyIterator {
         F: Fn(&Self::Item) -> bool
     {
         Filter::new(self, f)
+    }
+
+    fn fold<F, A>(mut self, acc: A, f: F) -> A 
+    where
+        Self: Sized,
+        F: Fn(A, Self::Item) -> A
+    {
+        let mut accum = acc;
+        while let Some(value) = self.next() {
+            accum = f(accum, value);
+        }
+        accum
     }
 }
