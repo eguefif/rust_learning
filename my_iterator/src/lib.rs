@@ -9,6 +9,7 @@ use crate::adaptors::enumerate::Enumerate;
 pub mod adaptors;
 pub mod my_iter;
 
+/// Adaptors definition
 pub trait MyIterator {
     type Item;
 
@@ -28,18 +29,6 @@ pub trait MyIterator {
         F: Fn(&Self::Item) -> bool
     {
         Filter::new(self, f)
-    }
-
-    fn fold<F, A>(mut self, acc: A, f: F) -> A 
-    where
-        Self: Sized,
-        F: Fn(A, Self::Item) -> A
-    {
-        let mut accum = acc;
-        while let Some(value) = self.next() {
-            accum = f(accum, value);
-        }
-        accum
     }
 
     fn take(self, n: usize) -> Take::<Self> 
@@ -76,4 +65,44 @@ pub trait MyIterator {
     {
         Enumerate::new(self)
     }
+
+/// Consumers definition
+    fn fold<F, A>(mut self, acc: A, f: F) -> A 
+    where
+        Self: Sized,
+        F: Fn(A, Self::Item) -> A
+    {
+        let mut accum = acc;
+        while let Some(value) = self.next() {
+            accum = f(accum, value);
+        }
+        accum
+    }
+
+    fn any<F>(mut self, f: F) -> bool
+    where
+        Self: Sized,
+        F: Fn(Self::Item) -> bool
+    {
+        while let Some(value) = self.next() {
+            if f(value) == true {
+                return true;
+            }
+        }
+        false
+    }
+
+    fn all<F>(mut self, f: F) -> bool
+    where
+        Self: Sized,
+        F: Fn(Self::Item) -> bool
+    {
+        while let Some(value) = self.next() {
+            if f(value) == false {
+                return false
+            }
+        }
+        true
+    }
+
 }

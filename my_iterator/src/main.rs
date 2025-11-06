@@ -121,4 +121,36 @@ mod test{
         assert_eq!(Some((2, &2)), itr.next());
         assert_eq!(None, itr.next());
     }
+
+    #[test]
+    fn any_find_one_and_return_true() {
+        let v1 = vec![0, 1, 2];
+        let result = v1.my_iter().any(|x| *x == 1);
+
+        assert_eq!(result, true);
+    }
+
+    #[test]
+    fn any_find_nothing_and_return_false() {
+        let v1 = vec![0, 1, 2];
+        let result = v1.my_iter().any(|x| *x == 4);
+
+        assert_eq!(result, false);
+    }
+
+    #[test]
+    fn all_find_all_and_return_true() {
+        let v1 = vec![1, 1, 1];
+        let result = v1.my_iter().all(|x| *x == 1);
+
+        assert_eq!(result, true);
+    }
+
+    #[test]
+    fn all_find_one_false_and_return_false() {
+        let v1 = vec![0, 1, 2];
+        let result = v1.my_iter().all(|x| *x == 2);
+
+        assert_eq!(result, false);
+    }
 }
