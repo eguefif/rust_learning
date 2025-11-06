@@ -38,7 +38,7 @@ mod test{
     }
 
     #[test]
-    fn map_should_return_lengnths() {
+    fn map_should_return_lengths() {
         let v = vec!["hello".to_string(), "world".to_string()];
         let mut itr = v.my_iter().map(|v| v.len());
 

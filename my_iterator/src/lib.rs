@@ -1,6 +1,7 @@
 use crate::adaptors::map::Map;
 use crate::adaptors::filter::Filter;
 use crate::adaptors::take::Take;
+use crate::adaptors::skip::Skip;
 
 pub mod adaptors;
 pub mod my_iter;
@@ -43,5 +44,12 @@ pub trait MyIterator {
         Self: Sized,
     {
         Take::new(self, n)
+    }
+
+    fn skip(self, n: usize) -> Skip::<Self>
+    where
+        Self: Sized,
+    {
+        Skip::new(self, n)
     }
 }
