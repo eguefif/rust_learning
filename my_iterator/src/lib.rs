@@ -4,6 +4,7 @@ use crate::adaptors::take::Take;
 use crate::adaptors::skip::Skip;
 use crate::adaptors::chain::Chain;
 use crate::adaptors::zip::Zip;
+use crate::adaptors::enumerate::Enumerate;
 
 pub mod adaptors;
 pub mod my_iter;
@@ -67,5 +68,12 @@ pub trait MyIterator {
         Self: Sized,
     {
         Zip::new(self, iter)
+    }
+
+    fn enumerate(self) -> Enumerate::<Self>
+    where
+        Self: Sized,
+    {
+        Enumerate::new(self)
     }
 }

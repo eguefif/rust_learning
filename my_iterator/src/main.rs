@@ -110,4 +110,15 @@ mod test{
         assert_eq!(Some((&1, &3)), itr.next());
         assert_eq!(None, itr.next());
     }
+
+    #[test]
+    fn enumerate_iterator() {
+        let v1 = vec![0, 1, 2];
+        let mut itr = v1.my_iter().enumerate();
+
+        assert_eq!(Some((0, &0)), itr.next());
+        assert_eq!(Some((1, &1)), itr.next());
+        assert_eq!(Some((2, &2)), itr.next());
+        assert_eq!(None, itr.next());
+    }
 }
