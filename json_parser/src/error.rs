@@ -1,0 +1,33 @@
+use crate::token::tokenizer::Token;
+use std::fmt::{Display, Formatter};
+use std::error::Error;
+
+#[derive(Debug, PartialEq)]
+pub enum JsonError {
+    EmptyInput,
+    UnexpectedToken(Token),
+    KeyError(Token),
+    ValueError(Token),
+    CollonError(Token),
+    ComaError(Token),
+    EndObjectError(Token),
+    UnexpectedEndOfJson,
+}
+
+impl Error for JsonError {}
+
+impl Display for JsonError {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        let msg = match self {
+            JsonError::UnexpectedEndOfJson => format!("Unexpected end of json string."),
+            JsonError::EmptyInput => format!("Empty input string"),
+            JsonError::UnexpectedToken(got) => format!("Unexpected token, got: {}", got),
+            JsonError::KeyError(token) => format!("Key error, got: {}", token),
+            JsonError::ValueError(token) => format!("Value error, got: {}", token),
+            JsonError::CollonError(token) => format!("Expected collon ':' but got: {}", token),
+            JsonError::ComaError(token) => format!("Expected coma ',' but got: {}", token),
+            JsonError::EndObjectError(token) => format!("Object does not end properly, got: {}", token),
+        };
+        write!(f, "Error: {}", msg)
+    }
+}

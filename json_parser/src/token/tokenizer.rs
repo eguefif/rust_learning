@@ -2,6 +2,8 @@ use std::iter::Iterator;
 use std::iter::Peekable;
 use std::str::Chars;
 
+use std::fmt::{Display, Formatter};
+
 #[derive(Debug, PartialEq)]
 pub enum Token {
     OpenCurlybracket,
@@ -14,6 +16,25 @@ pub enum Token {
     Int(i64),
     Float(f64),
     Bool(bool)
+}
+
+impl Display for Token {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        let msg = match self {
+            Token::OpenCurlybracket => format!("}}"),
+            Token::CloseCurlybracket => format!("{{"),
+            Token::OpenBracket => format!("["),
+            Token::CloseBracket => format!("]"),
+            Token::Comma => format!(":"),
+            Token::Colon => format!(","),
+            Token::Str(value) => format!("String: {}", value),
+            Token::Int(value) => format!("Num: {}", value),
+            Token::Float(value) => format!("Num: {}", value),
+            Token::Bool(value) => format!("Bool {}", value),
+        };
+
+        write!(f, "{}", msg)
+    }
 }
 
 #[derive(Debug)]
@@ -116,7 +137,7 @@ impl Tokenizer<'_> {
         } else if boolean_str == "false" {
             return Token:: Bool(false)
         }
-        panic!("Error: bool type is not well formed: {}", boolean_str);
+        Token::Str(boolean_str)
     }
 }
 
