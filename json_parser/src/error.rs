@@ -11,6 +11,7 @@ pub enum JsonError {
     CollonError(Token),
     ComaError(Token),
     EndObjectError(Token),
+    InvalidComaEndObjectError,
     UnexpectedEndOfJson,
 }
 
@@ -19,6 +20,7 @@ impl Error for JsonError {}
 impl Display for JsonError {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
         let msg = match self {
+            JsonError::InvalidComaEndObjectError => format!("An object must not end with a coma."),
             JsonError::UnexpectedEndOfJson => format!("Unexpected end of json string."),
             JsonError::EmptyInput => format!("Empty input string"),
             JsonError::UnexpectedToken(got) => format!("Unexpected token, got: {}", got),

@@ -77,7 +77,12 @@ fn expect_colon(tokenizer: &mut Tokenizer) -> Result<(), JsonError> {
 fn is_object_ending(tokenizer: &mut Tokenizer) -> Result<bool, JsonError> {
     if let Some(next_token) = tokenizer.next() {
         match next_token {
-            Token::Comma => return Ok(false),
+            Token::Comma => {
+                if tokenizer.is_next_token_closing_curly_bracket() {
+                    return Err(JsonError::InvalidComaEndObjectError);
+                }
+                return Ok(false);
+            }
             Token::CloseCurlybracket => return Ok(true),
             _ => return Err(JsonError::EndObjectError(next_token))
         }

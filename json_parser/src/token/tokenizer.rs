@@ -68,10 +68,23 @@ impl<'a> Iterator for Tokenizer<'a> {
         }
         None
     }
-
 }
 
 impl Tokenizer<'_> {
+    pub fn is_next_token_closing_curly_bracket(&mut self) -> bool {
+        while let Some(peek) = self.json.peek() {
+            match peek {
+                ' ' | '\t' | '\n' => {
+                    self.json.next();
+                    continue;
+                },
+                '}' => return true,
+                _ => return false,
+            }
+        }
+        false
+    }
+
     fn parse_complex_token(&mut self, token: char) -> Token {
         if token == '"' {
             return self.parse_string();
