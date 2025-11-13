@@ -13,13 +13,28 @@ pub enum JsonType {
 
 #[derive(Debug)]
 pub struct Json {
-    pub(crate) data: Object,
+    pub(crate) data: JsonType,
 }
+
 
 impl Index<&str> for Json {
     type Output = JsonType;
 
     fn index<'a, 'b>(&'a self, index: &'b str) -> &'a Self::Output {
-        &self.data[index]
+        if let JsonType::Object(obj) = &self.data {
+            return &obj[index]
+        }
+        panic!();
+    }
+}
+
+impl Index<usize> for Json {
+    type Output = JsonType;
+
+    fn index<'a, 'b>(&'a self, index: usize) -> &'a Self::Output {
+        if let JsonType::Array(obj) = &self.data {
+            return &obj[index]
+        }
+        panic!();
     }
 }

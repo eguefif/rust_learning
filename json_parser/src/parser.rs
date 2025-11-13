@@ -23,9 +23,12 @@ impl<'a> Parser<'a> {
             match token {
                 Token::OpenCurlybracket => {
                     let data = self.parse_object()?;
-                    return Ok(Json { data });
+                    return Ok(Json { data: JsonType::Object(Box::new(data)) });
                 },
-                Token::OpenBracket => {todo!()},
+                Token::OpenBracket => {
+                    let data = self.parse_array()?;
+                    return Ok(Json { data: JsonType::Array(data) });
+                },
                 _ => return Err(JsonError::UnexpectedToken(token)),
             }
             
