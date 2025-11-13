@@ -2,44 +2,12 @@ use std::iter::Iterator;
 use std::iter::Peekable;
 use std::str::Chars;
 
-use std::fmt::{Display, Formatter};
+pub use super::token::Token;
 
-#[derive(Debug, PartialEq)]
-pub enum Token {
-    OpenCurlybracket,
-    CloseCurlybracket,
-    OpenBracket,
-    CloseBracket,
-    Comma,
-    Colon,
-    Str(String),
-    Int(i64),
-    Float(f64),
-    Bool(bool)
-}
-
-impl Display for Token {
-    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
-        let msg = match self {
-            Token::OpenCurlybracket => format!("}}"),
-            Token::CloseCurlybracket => format!("{{"),
-            Token::OpenBracket => format!("["),
-            Token::CloseBracket => format!("]"),
-            Token::Comma => format!(":"),
-            Token::Colon => format!(","),
-            Token::Str(value) => format!("String: {}", value),
-            Token::Int(value) => format!("Num: {}", value),
-            Token::Float(value) => format!("Num: {}", value),
-            Token::Bool(value) => format!("Bool {}", value),
-        };
-
-        write!(f, "{}", msg)
-    }
-}
-
+/// Tokenizes JSON input into a stream of tokens
 #[derive(Debug)]
 pub struct Tokenizer<'a> {
-    json: Peekable<Chars<'a>> 
+    json: Peekable<Chars<'a>>
 }
 
 impl<'a> Tokenizer<'a> {
@@ -51,6 +19,7 @@ impl<'a> Tokenizer<'a> {
 impl<'a> Iterator for Tokenizer<'a> {
     type Item = Token;
 
+    /// Returns the next token from the JSON input, skipping whitespace
     fn next(&mut self) -> Option<Self::Item> {
         while let Some(token) = self.json.next() {
             match token {
@@ -71,6 +40,7 @@ impl<'a> Iterator for Tokenizer<'a> {
 }
 
 impl Tokenizer<'_> {
+    /// Checks if the next non-whitespace token is a closing curly bracket
     pub fn is_next_token_closing_curly_bracket(&mut self) -> bool {
         while let Some(peek) = self.json.peek() {
             match peek {
