@@ -1,13 +1,128 @@
+//! JSON parser library
+//!
+//! This library provides functionality for parsing JSON strings into Rust data structures.
+//! The main entry point is the [`from_string`] function, which parses a JSON string
+//! and returns a [`Json`] struct that can be indexed using string keys (for objects)
+//! or numeric indices (for arrays).
+//!
+//! # Examples
+//!
+//! ```
+//! use json_parser::from_string;
+//! use json_parser::JsonType;
+//! use json_parser::parser::num::Num;
+//!
+//! let json_str = r#"{"name": "Alice", "age": 30}"#;
+//! let json = from_string(json_str).unwrap();
+//!
+//! // Access values using string indexing
+//! assert_eq!(json["name"], JsonType::Str("Alice".to_string()));
+//! ```
+
+use std::ops::Index;
 use crate::token::tokenizer::Tokenizer;
 use crate::parser::Parser;
 use crate::error::JsonError;
+use crate::parser::num::Num;
 
 pub mod token;
 pub mod parser;
 pub mod error;
 
-pub use parser::json::{Json, JsonType, Object};
+pub use parser::object::Object;
 
+#[derive(Debug, PartialEq)]
+pub enum JsonType {
+    Str(String),
+    Num(Num),
+    Bool(bool),
+    Object(Box<Object>),
+    Array(Vec<JsonType>)
+}
+
+/// A parsed JSON document that can be indexed by string keys or numeric indices
+///
+/// # Examples
+///
+/// ```
+/// use json_parser::from_string;
+/// use json_parser::JsonType;
+/// use json_parser::parser::num::Num;
+///
+/// let json_str = r#"{"name": "Alice", "age": 30}"#;
+/// let json = from_string(json_str).unwrap();
+///
+/// // Access values using string indexing
+/// assert_eq!(json["name"], JsonType::Str("Alice".to_string()));
+///
+/// // Nested objects
+/// let json_str = r#"{"user": {"name": "Bob"}}"#;
+/// let json = from_string(json_str).unwrap();
+/// if let JsonType::Object(user) = &json["user"] {
+///     assert_eq!(user["name"], JsonType::Str("Bob".to_string()));
+/// }
+///
+/// // Arrays
+/// let json_str = r#"{"items": [1, 2, 3]}"#;
+/// let json = from_string(json_str).unwrap();
+/// if let JsonType::Array(items) = &json["items"] {
+///     assert_eq!(items[0], JsonType::Num(Num::Integer(1)));
+/// }
+/// ```
+#[derive(Debug)]
+pub struct Json {
+    pub(crate) data: JsonType,
+}
+
+impl Index<&str> for Json {
+    type Output = JsonType;
+
+    fn index<'a, 'b>(&'a self, index: &'b str) -> &'a Self::Output {
+        if let JsonType::Object(obj) = &self.data {
+            return &obj[index]
+        }
+        panic!();
+    }
+}
+
+impl Index<usize> for Json {
+    type Output = JsonType;
+
+    fn index<'a, 'b>(&'a self, index: usize) -> &'a Self::Output {
+        if let JsonType::Array(obj) = &self.data {
+            return &obj[index]
+        }
+        panic!();
+    }
+}
+
+/// Parses a JSON string into a Json structure
+///
+/// # Arguments
+///
+/// * `json_string` - A string slice containing valid JSON
+///
+/// # Returns
+///
+/// * `Ok(Json)` - Successfully parsed JSON document
+/// * `Err(JsonError)` - Parsing failed due to malformed JSON
+///
+/// # Examples
+///
+/// ```
+/// use json_parser::from_string;
+/// use json_parser::JsonType;
+///
+/// // Parse a simple JSON object
+/// let json = from_string(r#"{"name": "Alice", "age": 30}"#).unwrap();
+/// assert_eq!(json["name"], JsonType::Str("Alice".to_string()));
+///
+/// // Parse JSON with arrays
+/// let json = from_string(r#"{"items": [1, 2, 3]}"#).unwrap();
+/// if let JsonType::Array(items) = &json["items"] {
+///     assert_eq!(items.len(), 3);
+/// }
+/// ```
 pub fn from_string(json_string: &str) -> Result<Json, JsonError> {
     let tokenizer = Tokenizer::new(json_string);
     let mut parser = Parser::new(tokenizer);

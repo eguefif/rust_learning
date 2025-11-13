@@ -1,5 +1,5 @@
 use std::ops::Index;
-use super::json::JsonType;
+use crate::JsonType;
 
 #[derive(Debug, PartialEq)]
 pub struct Object {

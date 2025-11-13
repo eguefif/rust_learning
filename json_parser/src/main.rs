@@ -1,4 +1,5 @@
 use json_parser::from_string;
+use json_parser::JsonType;
 
 fn main() {
     let json = r#"
@@ -8,8 +9,16 @@ fn main() {
     "key3": 1.1,
     "key4": 15.13,
     "key5": false,
-    "key6": true
+    "key6": true,
+    "key7": {
+        "key71": 1,
+        "key72": "Hello, world"
+    }, 
+    "key8": [1, 2, 3]
 }"#;
     let j = from_string(json).unwrap();
-    println!("{:?}", j["key1"]);
+    let obj = &j["key7"];
+    if let JsonType::Object(obj) = obj {
+        println!("{:?}", obj);
+    }
 }
