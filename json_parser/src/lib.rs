@@ -10,7 +10,7 @@
 //! ```
 //! use json_parser::from_string;
 //! use json_parser::JsonType;
-//! use json_parser::parser::num::Num;
+//! use json_parser::types::Num;
 //!
 //! let json_str = r#"{"name": "Alice", "age": 30}"#;
 //! let json = from_string(json_str).unwrap();
@@ -23,13 +23,14 @@ use std::ops::Index;
 use crate::token::tokenizer::Tokenizer;
 use crate::parser::Parser;
 use crate::error::JsonError;
-use crate::parser::num::Num;
+use crate::types::Num;
 
 pub mod token;
 pub mod parser;
 pub mod error;
+pub mod types;
 
-pub use parser::object::Object;
+pub use types::Object;
 
 #[derive(Debug, PartialEq)]
 pub enum JsonType {
@@ -47,7 +48,7 @@ pub enum JsonType {
 /// ```
 /// use json_parser::from_string;
 /// use json_parser::JsonType;
-/// use json_parser::parser::num::Num;
+/// use json_parser::types::Num;
 ///
 /// let json_str = r#"{"name": "Alice", "age": 30}"#;
 /// let json = from_string(json_str).unwrap();

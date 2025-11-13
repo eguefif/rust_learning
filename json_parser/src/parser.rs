@@ -1,10 +1,7 @@
 use crate::{Object, JsonType, Json};
-use crate::parser::num::Num;
+use crate::types::Num;
 use crate::token::tokenizer::{Token, Tokenizer};
 use crate::error::JsonError;
-
-pub mod num;
-pub mod object;
 
 // TODO: handle error in malformatted string (should I check the whole string ahead ?)
 
