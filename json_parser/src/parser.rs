@@ -5,9 +5,9 @@ use crate::error::JsonError;
 
 pub mod num;
 pub mod json;
+pub mod object;
 
 // TODO: handle error in malformatted string (should I check the whole string ahead ?)
-// TODO: parse array
 
 pub struct Parser<'a> {
     tokenizer: Tokenizer<'a>,
@@ -98,9 +98,30 @@ impl<'a> Parser<'a> {
                 let nested_object = self.parse_object()?;
                 return Ok(JsonType::Object(Box::new(nested_object)))
             }
+            Token::OpenBracket => {
+                let array = self.parse_array()?;
+                return Ok(JsonType::Array(array))
+            }
             _ => {}
         }
         Err(JsonError::ValueError(token))
+    }
+
+    fn parse_array(&mut self) -> Result<Vec<JsonType>, JsonError> {
+        let mut arr: Vec<JsonType> = Vec::new();
+        loop {
+            let token = self.tokenizer.next();
+            if let Some(token) = token {
+                let value = self.get_value(token)?;
+                arr.push(value);
+                if self.expect_coma_or_end_array()? {
+                    break;
+                }
+            } else {
+                return Err(JsonError::UnexpectedEndOfJson);
+            }
+        }
+        Ok(arr)
     }
 
     /// Expects either a comma or closing curly bracket after a key-value pair.
@@ -119,6 +140,28 @@ impl<'a> Parser<'a> {
                     return Ok(false);
                 }
                 Token::CloseCurlybracket => return Ok(true),
+                _ => return Err(JsonError::EndObjectError(next_token))
+            }
+        }
+        Err(JsonError::UnexpectedEndOfJson)
+    }
+
+    /// Expects either a comma or closing bracket after a key-value pair.
+    ///
+    /// Returns:
+    /// - `Ok(true)` if the object ends (closing bracket encountered)
+    /// - `Ok(false)` if there are more key-value pairs (comma encountered)
+    /// - `Err` if an invalid token is encountered or if the JSON ends unexpectedly
+    fn expect_coma_or_end_array(&mut self) -> Result<bool, JsonError> {
+        if let Some(next_token) = self.tokenizer.next() {
+            match next_token {
+                Token::Comma => {
+                    if self.tokenizer.is_next_token_closing_curly_bracket() {
+                        return Err(JsonError::InvalidComaEndObjectError);
+                    }
+                    return Ok(false);
+                }
+                Token::CloseBracket => return Ok(true),
                 _ => return Err(JsonError::EndObjectError(next_token))
             }
         }
@@ -168,11 +211,31 @@ mod tests {
         assert_eq!(json["key1"], JsonType::Str("value1".to_string()));
         let nested_object = &json["key2"];
         if let JsonType::Object(nested_object) = nested_object {
-            println!("obj: {:?}", nested_object);
             assert_eq!(nested_object["key21"], JsonType::Str("Hello".to_string()));
             assert_eq!(nested_object["key22"], JsonType::Str("World".to_string()));
         } else {
             panic!("json[\"key2\"] should be an object");
+        }
+    }
+
+    #[test]
+    fn it_should_parse_arrayjson() {
+        let json = r#"
+{ 
+    "key1": "value1",
+    "key2": [1, "salut", 3.3]
+}"#;
+        let tokenizer = Tokenizer::new(json);
+        let mut parser = Parser::new(tokenizer);
+        let json = parser.parse_tokens().unwrap();
+        assert_eq!(json["key1"], JsonType::Str("value1".to_string()));
+        let array = &json["key2"];
+        if let JsonType::Array(array) = array {
+            assert_eq!(array[0], JsonType::Num(Num::Integer(1)));
+            assert_eq!(array[1], JsonType::Str("salut".to_string()));
+            assert_eq!(array[2], JsonType::Num(Num::Float(3.3)));
+        } else {
+            panic!("json[\"key2\"] should be an array");
         }
     }
 
