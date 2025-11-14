@@ -3,5 +3,5 @@
 This is a learning project to deepen my knowledge on Rust.
 
 ## Todo
-- [ ] implement from_json to be used with into/from in an object
+- [x] implement from_json to be used for every type and struct
 - [ ] implement to_json and an algo that serialize an object
