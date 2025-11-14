@@ -41,6 +41,28 @@ pub enum JsonType {
     Array(Vec<JsonType>)
 }
 
+impl Index<&str> for JsonType {
+    type Output = JsonType;
+
+    fn index<'a, 'b>(&'a self, index: &'b str) -> &'a Self::Output {
+        if let JsonType::Object(obj) = &self {
+            return &obj[index]
+        }
+        panic!();
+    }
+}
+
+impl Index<usize> for JsonType {
+    type Output = JsonType;
+
+    fn index<'a, 'b>(&'a self, index: usize) -> &'a Self::Output {
+        if let JsonType::Array(obj) = &self {
+            return &obj[index]
+        }
+        panic!();
+    }
+}
+
 /// A parsed JSON document that can be indexed by string keys or numeric indices
 ///
 /// # Examples
@@ -124,8 +146,22 @@ impl Index<usize> for Json {
 ///     assert_eq!(items.len(), 3);
 /// }
 /// ```
-pub fn from_string(json_string: &str) -> Result<Json, JsonError> {
+pub fn from_string<T: Deserialize>(json_string: &str) -> Result<T, JsonError> {
     let tokenizer = Tokenizer::new(json_string);
     let mut parser = Parser::new(tokenizer);
-    parser.parse_tokens()
+    let data = parser.parse_tokens()?;
+    <T as Deserialize>::deserialize(data)
+}
+
+impl Deserialize for Json {
+    fn deserialize(data: JsonType) -> Result<Self, JsonError> {
+        Ok(Json {
+            data
+        })
+    }
+}
+
+
+pub trait Deserialize {
+    fn deserialize(json: JsonType) -> Result<Self, JsonError> where Self: Sized;
 }

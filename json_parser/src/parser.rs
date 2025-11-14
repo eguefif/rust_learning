@@ -1,4 +1,4 @@
-use crate::{Object, JsonType, Json};
+use crate::{Object, JsonType};
 use crate::types::Num;
 use crate::token::tokenizer::{Token, Tokenizer};
 use crate::error::JsonError;
@@ -14,16 +14,16 @@ impl<'a> Parser<'a> {
         Self { tokenizer }
     }
 
-    pub fn parse_tokens(&mut self) -> Result<Json, JsonError> {
+    pub fn parse_tokens(&mut self) -> Result<JsonType, JsonError> {
         if let Some(token) = self.tokenizer.next() {
             match token {
                 Token::OpenCurlybracket => {
                     let data = self.parse_object()?;
-                    return Ok(Json { data: JsonType::Object(Box::new(data)) });
+                    return Ok(JsonType::Object(Box::new(data)));
                 },
                 Token::OpenBracket => {
                     let data = self.parse_array()?;
-                    return Ok(Json { data: JsonType::Array(data) });
+                    return Ok(JsonType::Array(data));
                 },
                 _ => return Err(JsonError::UnexpectedToken(token)),
             }

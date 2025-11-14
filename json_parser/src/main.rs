@@ -1,24 +1,33 @@
 use json_parser::from_string;
-use json_parser::JsonType;
+use json_parser::{JsonType, Deserialize, error::JsonError};
+
+// TODO: create a type and impl the Deserialize
+// Add a trait
+// Think about two Deserialize impl: one from a string, one from a Json return by from_string
+// It will be use for nested object in Deserialize
+//
+struct Person {
+    name: String
+}
+
+impl Deserialize for Person {
+    fn deserialize(data: JsonType) -> Result<Person, JsonError> {
+        if let JsonType::Str(name) = &data["name"] {
+            return Ok(Self {
+                name: name.to_string()
+            });
+        }
+        Err(JsonError::DeserializationError("Cannot find field string name in Json".to_string()))
+    }
+}
+
 
 fn main() {
     let json = r#"
 { 
-    "key1": "value1",
-    "key2": 5,
-    "key3": 1.1,
-    "key4": 15.13,
-    "key5": false,
-    "key6": true,
-    "key7": {
-        "key71": 1,
-        "key72": "Hello, world"
-    }, 
-    "key8": [1, 2, 3]
+    "name": "Hello World"
 }"#;
-    let j = from_string(json).unwrap();
-    let obj = &j["key7"];
-    if let JsonType::Object(obj) = obj {
-        println!("{:?}", obj);
-    }
+    let j: Person = from_string(json).unwrap();
+
+    println!("Hello: {}", j.name);
 }
