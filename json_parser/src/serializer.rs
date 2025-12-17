@@ -19,8 +19,29 @@ fn serialize_json(data: JsonType) -> Result<String, JsonError> {
                 retval.push_str("false");
             }
         },
+        JsonType::Array(value) => {
+            retval.push_str(&serialize_array(value)?)
+        }
         _ => todo!()
     }
+    Ok(retval)
+}
+
+fn serialize_array(input: Vec<JsonType>) -> Result<String, JsonError> {
+    let mut retval = String::new();
+    let mut peek = input.into_iter().peekable();
+    retval.push('[');
+    loop {
+        let Some(next_input) = peek.next() else {
+            return Err(JsonError::SerializationError("Wrong array format".to_string()));
+        };
+        retval.push_str(&serialize_json(next_input)?);
+        if let None = peek.peek() {
+            break;
+        }
+        retval.push(',');
+    }
+    retval.push(']');
     Ok(retval)
 }
 
@@ -54,11 +75,11 @@ mod tests {
     }
 
     #[test]
-    fn it_should_serialize_() {
+    fn it_should_serialize_array() {
         let v = vec![JsonType::Str("hello".to_string()), JsonType::Bool(true)];
         let input = JsonType::Array(v);
         let result = serialize_json(input).unwrap();
 
-        assert_eq!("[\"hello\", true]", result);
+        assert_eq!("[\"hello\",true]", result);
     }
 }
