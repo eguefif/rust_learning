@@ -2,34 +2,33 @@ use crate::JsonType;
 use crate::types::Object;
 use crate::error::JsonError;
 
-fn serialize_json(data: JsonType) -> Result<String, JsonError> {
+pub fn serialize_json(data: &JsonType) -> Result<String, JsonError> {
     let mut retval = String::new();
     match data {
         JsonType::Str(value) => {
             retval.push('"');
-            retval.push_str(&value);
+            retval.push_str(value);
             retval.push('"');
         }
         JsonType::Num(value) => {
             retval.push_str(&value.serialize());
         }
         JsonType::Bool(value) => {
-            if value == true {
+            if value == &true {
                 retval.push_str("true");
             } else {
                 retval.push_str("false");
             }
         }
         JsonType::Array(value) => retval.push_str(&serialize_array(value)?),
-        JsonType::Object(value) => retval.push_str(&serialize_object(*value)?),
-        _ => todo!(),
+        JsonType::Object(value) => retval.push_str(&serialize_object(value)?),
     }
     Ok(retval)
 }
 
-fn serialize_array(input: Vec<JsonType>) -> Result<String, JsonError> {
+fn serialize_array(input: &Vec<JsonType>) -> Result<String, JsonError> {
     let mut retval = String::new();
-    let mut peek = input.into_iter().peekable();
+    let mut peek = input.iter().peekable();
     retval.push('[');
     loop {
         let Some(next_input) = peek.next() else {
@@ -47,9 +46,9 @@ fn serialize_array(input: Vec<JsonType>) -> Result<String, JsonError> {
     Ok(retval)
 }
 
-fn serialize_object(input: Object) -> Result<String, JsonError> {
+fn serialize_object(input: &Object) -> Result<String, JsonError> {
     let mut retval = String::new();
-    let mut peek = input.data.into_iter().peekable();
+    let mut peek = input.data.iter().peekable();
     retval.push('{');
     loop {
         let Some((key, value)) = peek.next() else {
@@ -79,7 +78,7 @@ mod tests {
     #[test]
     fn it_should_serialize_string() {
         let input = JsonType::Str("Hello, World".to_string());
-        let result = serialize_json(input).unwrap();
+        let result = serialize_json(&input).unwrap();
 
         assert_eq!("\"Hello, World\"", result);
     }
@@ -87,7 +86,7 @@ mod tests {
     #[test]
     fn it_should_serialize_num() {
         let input = JsonType::Num(Num::Integer(54));
-        let result = serialize_json(input).unwrap();
+        let result = serialize_json(&input).unwrap();
 
         assert_eq!("54", result);
     }
@@ -95,7 +94,7 @@ mod tests {
     #[test]
     fn it_should_serialize_bool() {
         let input = JsonType::Bool(true);
-        let result = serialize_json(input).unwrap();
+        let result = serialize_json(&input).unwrap();
 
         assert_eq!("true", result);
     }
@@ -104,7 +103,7 @@ mod tests {
     fn it_should_serialize_array() {
         let v = vec![JsonType::Str("hello".to_string()), JsonType::Bool(true)];
         let input = JsonType::Array(v);
-        let result = serialize_json(input).unwrap();
+        let result = serialize_json(&input).unwrap();
 
         assert_eq!("[\"hello\",true]", result);
     }
@@ -116,7 +115,7 @@ mod tests {
             ("key2".to_string(), JsonType::Bool(true)),
         ]};
         let input = JsonType::Object(Box::new(v));
-        let result = serialize_json(input).unwrap();
+        let result = serialize_json(&input).unwrap();
 
         assert_eq!("{\"key1\":\"hello\",\"key2\":true}", result);
     }

@@ -1,5 +1,6 @@
-use json_parser::from_string;
-use json_parser::{Deserialize, JsonType, error::JsonError};
+use json_parser::{from_string, to_string};
+use json_parser::types::Object;
+use json_parser::{Deserialize, JsonType, error::JsonError, Serialize};
 
 // TODO: create a type and impl the Deserialize
 // Add a trait
@@ -23,7 +24,16 @@ impl Deserialize for Person {
     }
 }
 
+impl Serialize for Person {
+    fn serialize(&self) -> JsonType {
+        let v = vec![("name".to_string(), JsonType::Str(self.name.clone()))];
+        let object = Object { data: v };
+        JsonType::Object(Box::new(object))
+    }
+}
+
 fn main() {
+    // Example with struct
     let json = r#"
 { 
     "name": "Hello World"
@@ -32,7 +42,13 @@ fn main() {
 
     println!("Hello: {}", j.name);
 
+    let serialized: String = to_string(j).unwrap();
+    println!("Peson serialized: {}", serialized);
+
+    // Example with generic data
     let json_str = r#"{"name": "Alice", "age": 30}"#;
     let json: JsonType = from_string(json_str).unwrap();
     println!("{:?}", json["age"]);
+    let serialized = to_string(json).unwrap();
+    println!("Serialized: {}", serialized);
 }
