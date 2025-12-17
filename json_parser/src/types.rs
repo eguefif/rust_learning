@@ -11,7 +11,7 @@ impl Num {
     pub fn serialize(&self) -> String {
         match self {
             Num::Integer(value) => value.to_string(),
-            Num::Float(value) => value.to_string()
+            Num::Float(value) => value.to_string(),
         }
     }
 }
@@ -20,7 +20,6 @@ impl Num {
 pub struct Object {
     pub(crate) data: Vec<(String, JsonType)>,
 }
-
 
 impl Index<&str> for Object {
     type Output = JsonType;
