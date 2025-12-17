@@ -31,68 +31,21 @@ pub mod types;
 
 pub use types::Object;
 
-/// A parsed JSON document that can be indexed by string keys or numeric indices
+/// A parsed JSON enum that can be indexed by string keys or numeric indices
 ///
 /// # Examples
 ///
 /// ```
-/// use json_parser::{from_string, Json, JsonType};
+/// use json_parser::{from_string, JsonType};
 /// use json_parser::types::Num;
 ///
 /// let json_str = r#"{"name": "Alice", "age": 30}"#;
-/// let json: Json = from_string(json_str).unwrap();
+/// let json: JsonType = from_string(json_str).unwrap();
 ///
 /// // Access values using string indexing
 /// assert_eq!(json["name"], JsonType::Str("Alice".to_string()));
-///
-/// // Nested objects
-/// let json_str = r#"{"user": {"name": "Bob"}}"#;
-/// let json: Json = from_string(json_str).unwrap();
-/// if let JsonType::Object(user) = &json["user"] {
-///     assert_eq!(user["name"], JsonType::Str("Bob".to_string()));
-/// }
-///
-/// // Arrays
-/// let json_str = r#"{"items": [1, 2, 3]}"#;
-/// let json: Json = from_string(json_str).unwrap();
-/// if let JsonType::Array(items) = &json["items"] {
-///     assert_eq!(items[0], JsonType::Num(Num::Integer(1)));
-/// }
 /// ```
-#[derive(Debug)]
-pub struct Json {
-    pub(crate) data: JsonType,
-}
 
-impl Index<&str> for Json {
-    type Output = JsonType;
-
-    fn index<'a, 'b>(&'a self, index: &'b str) -> &'a Self::Output {
-        if let JsonType::Object(obj) = &self.data {
-            return &obj[index];
-        }
-        panic!();
-    }
-}
-
-impl Index<usize> for Json {
-    type Output = JsonType;
-
-    fn index<'a, 'b>(&'a self, index: usize) -> &'a Self::Output {
-        if let JsonType::Array(obj) = &self.data {
-            return &obj[index];
-        }
-        panic!();
-    }
-}
-
-impl Deserialize for Json {
-    fn deserialize(data: JsonType) -> Result<Self, JsonError> {
-        Ok(Json { data })
-    }
-}
-
-/// A JsonType for each value. This can be indexed by usize or &str.
 #[derive(Debug, PartialEq)]
 pub enum JsonType {
     Str(String),
@@ -100,6 +53,15 @@ pub enum JsonType {
     Bool(bool),
     Object(Box<Object>),
     Array(Vec<JsonType>),
+}
+
+// This impl allow the following use case:
+//  let json_str = r#"{"name": "Alice", "age": 30}"#;
+//  let json: JsonType = from_string(json_str).unwrap();
+impl Deserialize for JsonType {
+    fn deserialize(data: JsonType) -> Result<Self, JsonError> {
+        Ok(data)
+    }
 }
 
 impl Index<&str> for JsonType {

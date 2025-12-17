@@ -1,5 +1,5 @@
 use json_parser::from_string;
-use json_parser::{Deserialize, Json, JsonType, error::JsonError};
+use json_parser::{Deserialize, JsonType, error::JsonError};
 
 // TODO: create a type and impl the Deserialize
 // Add a trait
@@ -33,6 +33,6 @@ fn main() {
     println!("Hello: {}", j.name);
 
     let json_str = r#"{"name": "Alice", "age": 30}"#;
-    let json: Json = from_string(json_str).unwrap();
+    let json: JsonType = from_string(json_str).unwrap();
     println!("{:?}", json["age"]);
 }
