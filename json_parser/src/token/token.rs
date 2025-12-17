@@ -12,7 +12,7 @@ pub enum Token {
     Str(String),
     Int(i64),
     Float(f64),
-    Bool(bool)
+    Bool(bool),
 }
 
 impl Display for Token {

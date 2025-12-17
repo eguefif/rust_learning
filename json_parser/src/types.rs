@@ -1,10 +1,10 @@
-use std::ops::Index;
 use crate::JsonType;
+use std::ops::Index;
 
 #[derive(Debug, PartialEq)]
 pub enum Num {
     Integer(i64),
-    Float(f64)
+    Float(f64),
 }
 
 #[derive(Debug, PartialEq)]

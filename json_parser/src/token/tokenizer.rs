@@ -7,12 +7,14 @@ pub use super::token::Token;
 /// Tokenizes JSON input into a stream of tokens
 #[derive(Debug)]
 pub struct Tokenizer<'a> {
-    json: Peekable<Chars<'a>>
+    json: Peekable<Chars<'a>>,
 }
 
 impl<'a> Tokenizer<'a> {
     pub fn new(json: &'a str) -> Tokenizer<'a> {
-        Tokenizer { json: json.chars().peekable() }
+        Tokenizer {
+            json: json.chars().peekable(),
+        }
     }
 }
 
@@ -32,7 +34,7 @@ impl<'a> Iterator for Tokenizer<'a> {
                 ' ' => continue,
                 '\t' => continue,
                 '\n' => continue,
-                _ => return Some(self.parse_complex_token(token))
+                _ => return Some(self.parse_complex_token(token)),
             }
         }
         None
@@ -47,7 +49,7 @@ impl Tokenizer<'_> {
                 ' ' | '\t' | '\n' => {
                     self.json.next();
                     continue;
-                },
+                }
                 '}' => return true,
                 _ => return false,
             }
@@ -61,7 +63,7 @@ impl Tokenizer<'_> {
         } else if token.is_numeric() {
             return self.parse_numeric(token);
         } else if token == 'f' || token == 't' {
-            return self.parse_bool(token)
+            return self.parse_bool(token);
         } else {
             panic!("Error: unknown char: |{}|", token);
         }
@@ -75,7 +77,7 @@ impl Tokenizer<'_> {
             }
             string_token.push(next_char)
         }
-        panic!("Error: string does not end with \" token"); 
+        panic!("Error: string does not end with \" token");
     }
 
     fn parse_numeric(&mut self, token: char) -> Token {
@@ -85,21 +87,24 @@ impl Tokenizer<'_> {
         while let Some(peek_char) = self.json.peek() {
             if peek_char.is_numeric() {
                 numeric_string.push(*peek_char);
-            }  else if *peek_char == '.' {
+            } else if *peek_char == '.' {
                 numeric_string.push(*peek_char);
                 is_float = true;
-            }
-            else {
+            } else {
                 break;
             }
             self.json.next();
         }
 
         if is_float == true {
-            let number = numeric_string.parse::<f64>().expect("Error: string is not a number");
+            let number = numeric_string
+                .parse::<f64>()
+                .expect("Error: string is not a number");
             return Token::Float(number);
         } else {
-            let number = numeric_string.parse::<i64>().expect("Error: string is not a number");
+            let number = numeric_string
+                .parse::<i64>()
+                .expect("Error: string is not a number");
             return Token::Int(number);
         }
     }
@@ -118,7 +123,7 @@ impl Tokenizer<'_> {
         if boolean_str == "true" {
             return Token::Bool(true);
         } else if boolean_str == "false" {
-            return Token:: Bool(false)
+            return Token::Bool(false);
         }
         Token::Str(boolean_str)
     }
@@ -223,7 +228,6 @@ mod tests {
         assert_eq!(Token::Str("key22".to_string()), tokenizer.next().unwrap());
         assert_eq!(Token::Colon, tokenizer.next().unwrap());
         assert_eq!(Token::Bool(false), tokenizer.next().unwrap());
-
 
         assert_eq!(Token::CloseCurlybracket, tokenizer.next().unwrap());
         assert_eq!(Token::CloseCurlybracket, tokenizer.next().unwrap());

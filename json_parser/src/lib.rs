@@ -18,49 +18,18 @@
 //! assert_eq!(json["name"], JsonType::Str("Alice".to_string()));
 //! ```
 
-use std::ops::Index;
-use crate::token::tokenizer::Tokenizer;
-use crate::parser::Parser;
 use crate::error::JsonError;
+use crate::parser::Parser;
+use crate::token::tokenizer::Tokenizer;
 use crate::types::Num;
+use std::ops::Index;
 
-pub mod token;
-pub mod parser;
 pub mod error;
+pub mod parser;
+pub mod token;
 pub mod types;
 
 pub use types::Object;
-
-#[derive(Debug, PartialEq)]
-pub enum JsonType {
-    Str(String),
-    Num(Num),
-    Bool(bool),
-    Object(Box<Object>),
-    Array(Vec<JsonType>)
-}
-
-impl Index<&str> for JsonType {
-    type Output = JsonType;
-
-    fn index<'a, 'b>(&'a self, index: &'b str) -> &'a Self::Output {
-        if let JsonType::Object(obj) = &self {
-            return &obj[index]
-        }
-        panic!();
-    }
-}
-
-impl Index<usize> for JsonType {
-    type Output = JsonType;
-
-    fn index<'a, 'b>(&'a self, index: usize) -> &'a Self::Output {
-        if let JsonType::Array(obj) = &self {
-            return &obj[index]
-        }
-        panic!();
-    }
-}
 
 /// A parsed JSON document that can be indexed by string keys or numeric indices
 ///
@@ -100,7 +69,7 @@ impl Index<&str> for Json {
 
     fn index<'a, 'b>(&'a self, index: &'b str) -> &'a Self::Output {
         if let JsonType::Object(obj) = &self.data {
-            return &obj[index]
+            return &obj[index];
         }
         panic!();
     }
@@ -111,7 +80,45 @@ impl Index<usize> for Json {
 
     fn index<'a, 'b>(&'a self, index: usize) -> &'a Self::Output {
         if let JsonType::Array(obj) = &self.data {
-            return &obj[index]
+            return &obj[index];
+        }
+        panic!();
+    }
+}
+
+impl Deserialize for Json {
+    fn deserialize(data: JsonType) -> Result<Self, JsonError> {
+        Ok(Json { data })
+    }
+}
+
+/// A JsonType for each value. This can be indexed by usize or &str.
+#[derive(Debug, PartialEq)]
+pub enum JsonType {
+    Str(String),
+    Num(Num),
+    Bool(bool),
+    Object(Box<Object>),
+    Array(Vec<JsonType>),
+}
+
+impl Index<&str> for JsonType {
+    type Output = JsonType;
+
+    fn index<'a, 'b>(&'a self, index: &'b str) -> &'a Self::Output {
+        if let JsonType::Object(obj) = &self {
+            return &obj[index];
+        }
+        panic!();
+    }
+}
+
+impl Index<usize> for JsonType {
+    type Output = JsonType;
+
+    fn index<'a, 'b>(&'a self, index: usize) -> &'a Self::Output {
+        if let JsonType::Array(obj) = &self {
+            return &obj[index];
         }
         panic!();
     }
@@ -122,15 +129,6 @@ impl Index<usize> for Json {
 /// This function is generic over types that implement [`Deserialize`], allowing you to
 /// parse JSON directly into custom Rust structures or use the provided [`Json`] type
 /// for dynamic access.
-///
-/// # Arguments
-///
-/// * `json_string` - A string slice containing valid JSON
-///
-/// # Returns
-///
-/// * `Ok(T)` - Successfully parsed and deserialized data
-/// * `Err(JsonError)` - Parsing or deserialization failed
 ///
 /// # Examples
 ///
@@ -173,15 +171,6 @@ pub fn from_string<T: Deserialize>(json_string: &str) -> Result<T, JsonError> {
     let data = parser.parse_tokens()?;
     <T as Deserialize>::deserialize(data)
 }
-
-impl Deserialize for Json {
-    fn deserialize(data: JsonType) -> Result<Self, JsonError> {
-        Ok(Json {
-            data
-        })
-    }
-}
-
 
 /// Trait for types that can be deserialized from JSON data
 ///
@@ -241,5 +230,7 @@ impl Deserialize for Json {
 /// assert_eq!(person.name, "Alice");
 /// ```
 pub trait Deserialize {
-    fn deserialize(json: JsonType) -> Result<Self, JsonError> where Self: Sized;
+    fn deserialize(json: JsonType) -> Result<Self, JsonError>
+    where
+        Self: Sized;
 }

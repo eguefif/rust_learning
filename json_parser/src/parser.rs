@@ -1,7 +1,7 @@
-use crate::{Object, JsonType};
-use crate::types::Num;
-use crate::token::tokenizer::{Token, Tokenizer};
 use crate::error::JsonError;
+use crate::token::tokenizer::{Token, Tokenizer};
+use crate::types::Num;
+use crate::{JsonType, Object};
 
 // TODO: handle error in malformatted string (should I check the whole string ahead ?)
 
@@ -20,14 +20,13 @@ impl<'a> Parser<'a> {
                 Token::OpenCurlybracket => {
                     let data = self.parse_object()?;
                     return Ok(JsonType::Object(Box::new(data)));
-                },
+                }
                 Token::OpenBracket => {
                     let data = self.parse_array()?;
                     return Ok(JsonType::Array(data));
-                },
+                }
                 _ => return Err(JsonError::UnexpectedToken(token)),
             }
-            
         };
         Err(JsonError::EmptyInput)
     }
@@ -39,7 +38,7 @@ impl<'a> Parser<'a> {
             let key_value = self.get_key_value_pair()?;
             data.push(key_value);
             if self.expect_coma_or_end_object()? {
-                break
+                break;
             }
         }
         Ok(Object { data })
@@ -49,7 +48,7 @@ impl<'a> Parser<'a> {
         let next_token = self.tokenizer.next();
         let key = match next_token {
             Some(key) => self.get_key(key)?,
-            None => return Err(JsonError::UnexpectedEndOfJson)
+            None => return Err(JsonError::UnexpectedEndOfJson),
         };
 
         self.expect_colon()?;
@@ -65,7 +64,7 @@ impl<'a> Parser<'a> {
 
     fn get_key(&mut self, token: Token) -> Result<String, JsonError> {
         if let Token::Str(key) = token {
-            return Ok(key)
+            return Ok(key);
         }
         Err(JsonError::KeyError(token))
     }
@@ -87,19 +86,19 @@ impl<'a> Parser<'a> {
             Token::Int(value) => {
                 let num = Num::Integer(value);
                 return Ok(JsonType::Num(num));
-            },
+            }
             Token::Float(value) => {
                 let num = Num::Float(value);
                 return Ok(JsonType::Num(num));
-            },
+            }
             Token::Bool(value) => return Ok(JsonType::Bool(value)),
             Token::OpenCurlybracket => {
                 let nested_object = self.parse_object()?;
-                return Ok(JsonType::Object(Box::new(nested_object)))
+                return Ok(JsonType::Object(Box::new(nested_object)));
             }
             Token::OpenBracket => {
                 let array = self.parse_array()?;
-                return Ok(JsonType::Array(array))
+                return Ok(JsonType::Array(array));
             }
             _ => {}
         }
@@ -139,7 +138,7 @@ impl<'a> Parser<'a> {
                     return Ok(false);
                 }
                 Token::CloseCurlybracket => return Ok(true),
-                _ => return Err(JsonError::EndObjectError(next_token))
+                _ => return Err(JsonError::EndObjectError(next_token)),
             }
         }
         Err(JsonError::UnexpectedEndOfJson)
@@ -161,13 +160,12 @@ impl<'a> Parser<'a> {
                     return Ok(false);
                 }
                 Token::CloseBracket => return Ok(true),
-                _ => return Err(JsonError::EndObjectError(next_token))
+                _ => return Err(JsonError::EndObjectError(next_token)),
             }
         }
         Err(JsonError::UnexpectedEndOfJson)
     }
 }
-
 
 #[cfg(test)]
 mod tests {
@@ -245,7 +243,10 @@ mod tests {
         let mut parser = Parser::new(tokenizer);
         let json = parser.parse_tokens();
         if let Err(error) = json {
-            assert_eq!(error, JsonError::UnexpectedToken(Token::Str("a".to_string())));
+            assert_eq!(
+                error,
+                JsonError::UnexpectedToken(Token::Str("a".to_string()))
+            );
         } else {
             panic!("Expect error")
         }
