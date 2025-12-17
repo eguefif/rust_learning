@@ -8,11 +8,11 @@
 //! # Examples
 //!
 //! ```
-//! use json_parser::{from_string, Json, JsonType};
+//! use json_parser::{from_string, JsonType};
 //! use json_parser::types::Num;
 //!
 //! let json_str = r#"{"name": "Alice", "age": 30}"#;
-//! let json: Json = from_string(json_str).unwrap();
+//! let json: JsonType = from_string(json_str).unwrap();
 //!
 //! // Access values using string indexing
 //! assert_eq!(json["name"], JsonType::Str("Alice".to_string()));
@@ -26,6 +26,7 @@ use std::ops::Index;
 
 pub mod error;
 pub mod parser;
+pub mod serializer;
 pub mod token;
 pub mod types;
 
@@ -97,9 +98,9 @@ impl Index<usize> for JsonType {
 /// ## Parsing into the `Json` type for dynamic access
 ///
 /// ```
-/// use json_parser::{from_string, Json, JsonType};
+/// use json_parser::{from_string, JsonType};
 ///
-/// let json: Json = from_string(r#"{"name": "Alice", "age": 30}"#).unwrap();
+/// let json: JsonType = from_string(r#"{"name": "Alice", "age": 30}"#).unwrap();
 /// assert_eq!(json["name"], JsonType::Str("Alice".to_string()));
 /// ```
 ///
@@ -113,8 +114,7 @@ impl Index<usize> for JsonType {
 /// }
 ///
 /// impl Deserialize for Person {
-///     type Item = Person;
-///     fn deserialize(data: JsonType) -> Result<Self::Item, JsonError> {
+///     fn deserialize(data: JsonType) -> Result<Person, JsonError> {
 ///         if let JsonType::Str(name) = &data["name"] {
 ///             return Ok(Person {
 ///                 name: name.to_string()
@@ -139,58 +139,6 @@ pub fn from_string<T: Deserialize>(json_string: &str) -> Result<T, JsonError> {
 /// Implement this trait to enable parsing JSON strings directly into your custom types
 /// using the [`from_string`] function. The trait requires an associated type `Item` which
 /// represents the output type of deserialization.
-///
-/// # Examples
-///
-/// ## Basic implementation for a simple struct
-///
-/// ```
-/// use json_parser::{Deserialize, JsonType, error::JsonError};
-///
-/// struct Person {
-///     name: String,
-/// }
-///
-/// impl Deserialize for Person {
-///     type Item = Person;
-///
-///     fn deserialize(data: JsonType) -> Result<Self::Item, JsonError> {
-///         // Extract the "name" field from the JSON object
-///         if let JsonType::Str(name) = &data["name"] {
-///             return Ok(Person {
-///                 name: name.to_string()
-///             });
-///         }
-///         Err(JsonError::DeserializationError(
-///             "Cannot find field 'name' in JSON".to_string()
-///         ))
-///     }
-/// }
-/// ```
-///
-/// ## Using with `from_string`
-///
-/// ```
-/// use json_parser::{from_string, Deserialize, JsonType, error::JsonError};
-///
-/// # struct Person {
-/// #     name: String,
-/// # }
-/// #
-/// # impl Deserialize for Person {
-/// #     type Item = Person;
-/// #     fn deserialize(data: JsonType) -> Result<Self::Item, JsonError> {
-/// #         if let JsonType::Str(name) = &data["name"] {
-/// #             return Ok(Person { name: name.to_string() });
-/// #         }
-/// #         Err(JsonError::DeserializationError("Cannot find field 'name'".to_string()))
-/// #     }
-/// # }
-///
-/// let json = r#"{"name": "Alice"}"#;
-/// let person: Person = from_string(json).unwrap();
-/// assert_eq!(person.name, "Alice");
-/// ```
 pub trait Deserialize {
     fn deserialize(json: JsonType) -> Result<Self, JsonError>
     where

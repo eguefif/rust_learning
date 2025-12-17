@@ -7,10 +7,20 @@ pub enum Num {
     Float(f64),
 }
 
+impl Num {
+    pub fn serialize(&self) -> String {
+        match self {
+            Num::Integer(value) => value.to_string(),
+            Num::Float(value) => value.to_string()
+        }
+    }
+}
+
 #[derive(Debug, PartialEq)]
 pub struct Object {
     pub(crate) data: Vec<(String, JsonType)>,
 }
+
 
 impl Index<&str> for Object {
     type Output = JsonType;

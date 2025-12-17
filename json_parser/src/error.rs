@@ -14,6 +14,7 @@ pub enum JsonError {
     InvalidComaEndObjectError,
     UnexpectedEndOfJson,
     DeserializationError(String),
+    SerializationError(String),
 }
 
 impl Error for JsonError {}
@@ -21,6 +22,9 @@ impl Error for JsonError {}
 impl Display for JsonError {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
         let msg = match self {
+            JsonError::SerializationError(msg) => {
+                format!("Deserialization into struct error: {}.", msg)
+            }
             JsonError::DeserializationError(msg) => {
                 format!("Deserialization into struct error: {}.", msg)
             }
