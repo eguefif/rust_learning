@@ -2,11 +2,6 @@ use json_parser::{from_string, to_string};
 use json_parser::types::Object;
 use json_parser::{Deserialize, JsonType, error::JsonError, Serialize};
 
-// TODO: create a type and impl the Deserialize
-// Add a trait
-// Think about two Deserialize impl: one from a string, one from a Json return by from_string
-// It will be use for nested object in Deserialize
-//
 struct Person {
     name: String,
 }
@@ -33,7 +28,7 @@ impl Serialize for Person {
 }
 
 fn main() {
-    // Example with struct
+    // Example with a struct that implements Deserialize and Serialize
     let json = r#"
 { 
     "name": "Hello World"
