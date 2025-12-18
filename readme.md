@@ -11,9 +11,8 @@ As a do the project one by one, I review the the content. My progress are marked
 **Goal**: Master traits, generics, and trait-based API design
 
 ### Projects
-- [ ] Iterator Library (1 week)
-- [ ] JSON Parser/Serializer (1-2 weeks)
-- [ ] Intrusive Linked List (Optional, 1-2 days)
+- [x] Iterator Library (1 week)
+- [x] JSON Parser/Serializer (1-2 weeks)
 
 ---
 
@@ -113,19 +112,6 @@ struct Person {
 let json = to_json(&person)?;
 let person: Person = from_json(&json)?;
 ```
-
-### Optional: Intrusive Linked List (1-2 days)
-
-**What to Build**:
-- Doubly-linked list with `Rc<RefCell<Node>>`
-- Previous pointer using `Weak<T>` to prevent cycles
-- Basic operations: insert, remove, traverse
-
-**Key Learning Outcomes**:
-- `Box`, `Rc`, `Weak` basics
-- Interior mutability with `RefCell`
-- Why reference cycles leak memory
-- When to use smart pointers
 
 ### End State Checklist
 - ✅ Can write generic, composable APIs
