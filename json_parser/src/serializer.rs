@@ -1,6 +1,6 @@
 use crate::JsonType;
-use crate::types::Object;
 use crate::error::JsonError;
+use crate::types::Object;
 
 pub fn serialize_json(data: &JsonType) -> Result<String, JsonError> {
     let mut retval = String::new();
@@ -110,10 +110,12 @@ mod tests {
 
     #[test]
     fn it_should_serialize_object() {
-        let v = Object {data: vec![
-            ("key1".to_string(), JsonType::Str("hello".to_string())),
-            ("key2".to_string(), JsonType::Bool(true)),
-        ]};
+        let v = Object {
+            data: vec![
+                ("key1".to_string(), JsonType::Str("hello".to_string())),
+                ("key2".to_string(), JsonType::Bool(true)),
+            ],
+        };
         let input = JsonType::Object(Box::new(v));
         let result = serialize_json(&input).unwrap();
 

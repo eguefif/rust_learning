@@ -1,7 +1,7 @@
 use crate::JsonType;
 use std::ops::Index;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum Num {
     Integer(i64),
     Float(f64),
@@ -16,9 +16,15 @@ impl Num {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Object {
     pub(crate) data: Vec<(String, JsonType)>,
+}
+
+impl Object {
+    pub fn new(data: Vec<(String, JsonType)>) -> Self {
+        Self { data }
+    }
 }
 
 impl Index<&str> for Object {

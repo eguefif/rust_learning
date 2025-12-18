@@ -1,9 +1,9 @@
-use json_parser::{from_string, to_string};
 use json_parser::types::Object;
-use json_parser::{Deserialize, JsonType, error::JsonError, Serialize};
+use json_parser::{Deserialize, JsonType, Serialize, error::JsonError};
+use json_parser::{from_string, to_string};
 
 struct Person {
-    name: String,
+    pub name: String,
 }
 
 impl Deserialize for Person {
@@ -21,8 +21,9 @@ impl Deserialize for Person {
 
 impl Serialize for Person {
     fn serialize(&self) -> JsonType {
+        // Does user needs a helper function to build an object ?
         let v = vec![("name".to_string(), JsonType::Str(self.name.clone()))];
-        let object = Object { data: v };
+        let object = Object::new(v);
         JsonType::Object(Box::new(object))
     }
 }

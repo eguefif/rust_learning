@@ -20,10 +20,10 @@
 
 use crate::error::JsonError;
 use crate::parser::Parser;
+use crate::serializer::serialize_json;
 use crate::token::tokenizer::Tokenizer;
 use crate::types::Num;
 use std::ops::Index;
-use crate::serializer::serialize_json;
 
 pub mod error;
 pub mod parser;
@@ -48,7 +48,7 @@ pub use types::Object;
 /// assert_eq!(json["name"], JsonType::Str("Alice".to_string()));
 /// ```
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum JsonType {
     Str(String),
     Num(Num),
@@ -67,8 +67,8 @@ impl Deserialize for JsonType {
 }
 
 impl Serialize for JsonType {
-    fn serialize(&self) -> &JsonType {
-        self
+    fn serialize(&self) -> JsonType {
+        self.clone()
     }
 }
 
@@ -152,14 +152,13 @@ pub trait Deserialize {
         Self: Sized;
 }
 
-
 pub fn to_string<T: Serialize>(input: T) -> Result<String, JsonError> {
     let json_data = input.serialize();
-    serialize_json(json_data)
+    serialize_json(&json_data)
 }
 
 pub trait Serialize {
-    fn serialize(self: &Self) -> &JsonType;
+    fn serialize(self: &Self) -> JsonType;
 }
 
 #[cfg(test)]
@@ -168,10 +167,12 @@ mod tests {
 
     #[test]
     fn it_should_serialize_jsontype() {
-        let v = Object {data: vec![
-            ("key1".to_string(), JsonType::Str("hello".to_string())),
-            ("key2".to_string(), JsonType::Bool(true)),
-        ]};
+        let v = Object {
+            data: vec![
+                ("key1".to_string(), JsonType::Str("hello".to_string())),
+                ("key2".to_string(), JsonType::Bool(true)),
+            ],
+        };
         let input = JsonType::Object(Box::new(v));
         let result: String = to_string(input).unwrap();
 
