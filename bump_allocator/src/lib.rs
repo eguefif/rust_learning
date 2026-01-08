@@ -8,23 +8,17 @@ pub struct Arena {
 }
 
 impl Arena {
-    pub fn new(size: usize) -> Self {
-        let buffer = MmapOptions::new()
-            .len(size)
-            .map_anon()
-            .expect("Allocation failed");
-        Self {
+    pub fn new(size: usize) -> std::io::Result<Self> {
+        let buffer = MmapOptions::new().len(size).map_anon()?;
+        Ok(Self {
             buffer: RefCell::new(buffer),
             offset: Cell::new(0),
             buffer_len: size,
-        }
+        })
     }
 
-    // TODO: Finish readme
-    // TODO: add lifetime to be sure that pointers don't outlive the arena for safety
-    // TODO: check what happens when we try to allocate to much
-    // TODO: Impl error handling
-    pub fn alloc<T: Copy>(&self, value: T) -> &mut T {
+    // TODO: check what happens when we try to allocate too much
+    pub fn alloc<'arena, T: Copy>(&'arena self, value: T) -> &'arena mut T {
         let size = std::mem::size_of::<T>();
         let align = std::mem::align_of::<T>();
         let new_offset = (self.offset.get() + align - 1) & !(align - 1);
